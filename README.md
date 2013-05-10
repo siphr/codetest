@@ -1,5 +1,10 @@
 # Blazing Griffin Code Test
 
+OK, here's the plan -- download the three code files in this repo (`palindrome.cpp`,
+`topstack.cpp`, and `galaxy.cpp`) and implement the missing methods. Test out
+your solutions, then send email them back to [jobs@blazinggriffin.com](mailto:jobs@blazinggriffin.com)
+once you're done. 
+
 ## Part 1: Palindromes
 
 `palindrome.cpp` defines a function, `isPalindrome()`, that takes a C-style 
