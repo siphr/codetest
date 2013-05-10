@@ -2,8 +2,10 @@
 
 OK, here's the plan -- download the three code files in this repo (`palindrome.cpp`,
 `topstack.cpp`, and `galaxy.cpp`) and implement the missing methods. Test out
-your solutions, then send email them back to [jobs@blazinggriffin.com](mailto:jobs@blazinggriffin.com)
-once you're done. 
+your solutions, then send them back once you're done. 
+
+You can email solutions to [jobs@blazinggriffin.com](mailto:jobs@blazinggriffin.com), or
+fork the repo on GitHub and submit a pull request for extra karma.
 
 ## Part 1: Palindromes
 
