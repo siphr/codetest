@@ -102,8 +102,6 @@ StarList Galaxy::getRouteBetween(Star *a, Star *b)
 	StarList route;
 
 	// Implement me!
-	route.push_back(a);
-	route.push_back(b);
 
 	return route;
 }
@@ -111,7 +109,15 @@ StarList Galaxy::getRouteBetween(Star *a, Star *b)
 /// Helper function to print a route to the console
 void printRoute(StarList route)
 {
-	std::cout << "[" << route.size() << "]:" << std::endl << "\t";
+	std::cout << "[" << route.size() << "]:";
+
+	// Don't print 0-length routes!
+	if (route.size() <= 0)
+	{
+		std::cout << std::endl;
+		return;
+	}
+
 	for(int starIndex = 0; starIndex < route.size()-1; ++starIndex)
 	{
 		std::cout << *route[starIndex] << " -> ";
