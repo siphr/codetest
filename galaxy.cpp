@@ -58,8 +58,8 @@ public:
 	// Get a star
 	Star *getStar(int index);
 
-	// Return a list of stars to traverse in order to move from A to B.
-	StarList getRouteBetween(Star *a, Star *b, StarList& visited);
+	// Return a list of stars to traverse in order to move from A to B. See definition documentation.
+	void getRouteBetween(Star *a, Star *b, StarList& route);
 };
 
 Galaxy::Galaxy()
@@ -102,11 +102,10 @@ Star *Galaxy::getStar(int index)
  *  Gets the shortest route between 2 stars.
  *
  *  \details
- *  This method traverses the start node and its lanes until it reaches it's destination.
+ *  This method traverses the start node and its lanes until it reaches it's destination using recursion.
  *  The terminating condition is considered to be when the start node and the destination node are the
- *  same. The algorithm maintains a list of visited nodes to avoid infinite looping that'd cause
- *  seg_faults.
- *  This function assumes a directed graph as hinted by the lanes datastructure.
+ *  same. The algorithm keeps track of visited nodes to avoid infinite looping that'd cause seg_faults.
+ *  This function assumes a directed graph as hinted by the lanes data structure.
  *  This means that star.1 -> star.2 is not the same as star.2 -> star.1. Please see example below.
  *  
  *  \example
@@ -119,36 +118,47 @@ Star *Galaxy::getStar(int index)
  *  In the above case, the shortest route from star.1 to star.2 is 1 hop. However, the shortest route
  *  from star.2 to star.1 is 2 hops as it goes via star.3.
  */ 
-StarList Galaxy::getRouteBetween(Star *a, Star *b, StarList& visited)
+void Galaxy::getRouteBetween(Star *a, Star *b, StarList& route)
 {
     // update route
-    StarList route(visited);
     route.push_back(a);
     
     // Already at the destination so return the route
-    if (a == b) { return route; }
+    if (a == b)
+    {
+        return;
+    }
 
     const StarList& a_lanes = lanes[a];
-    std::vector<StarList> routes;
 
     StarList shorter_route;
     for (size_t i = 0; i < a_lanes.size(); ++i)
     {
         // skip if the node has been previously traversed 
-        if (std::find(visited.begin(), visited.end(), a_lanes[i]) != visited.end()) { continue; } 
+        if (std::find(route.begin(), route.end(), a_lanes[i]) != route.end())
+        {
+            continue;
+        } 
 
-        StarList potential_route = getRouteBetween(a_lanes[i], b, route);
+        // get route between neighbouring star to destination
+        StarList potential_route(route);
+        getRouteBetween(a_lanes[i], b, potential_route);
 
         // store if its the first route we find.
         if (shorter_route.empty())
+        {
             shorter_route = potential_route;
+        }
 
-        // compare to see if we have found a shorter_route and if so store that.
-        if (!potential_route.empty() && potential_route.size() < shorter_route.size())
+        // compare to see if we have found a shorter route and if so store that.
+        if (!potential_route.empty() && (potential_route.back() == b) && potential_route.size() < shorter_route.size())
+        {
             shorter_route = potential_route;
+        }
     }
     
-    return shorter_route;
+    // update route
+    route = shorter_route;
 }
 
 /// Helper function to print a route to the console
@@ -179,7 +189,7 @@ int main(int argc, char **argv)
 	Galaxy galaxy;
 
 	StarList route;
-	route = galaxy.getRouteBetween(galaxy.getStar(0), galaxy.getStar(2), route);
+	galaxy.getRouteBetween(galaxy.getStar(4), galaxy.getStar(2), route);
 
 	printRoute(route);
 }
