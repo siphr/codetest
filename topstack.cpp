@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stack>
 #include <iostream>
+#include <exception>
 
 /**
 @brief TopStack provides the standard push/pop stack methods, plus an additional
@@ -28,6 +29,26 @@ class TopStack
         std::stack<int> maxes;
 
 	public:
+
+        /// A generic stack exception class
+        class stack_exception : public std::exception
+        {
+            public:
+                stack_exception(const char* const method, const char* const exception) :
+                    m_exception(std::string(method) + ": " + exception)
+                { }
+
+                virtual ~stack_exception() throw() { }
+
+                const char* what() const throw()
+                {
+                    return m_exception.c_str();
+                }
+                
+            private:
+                const std::string m_exception;
+        };
+
 		/// Push a value onto the top of the stack
 		void push(int value);
 
@@ -69,9 +90,17 @@ void TopStack::push(int value)
  *
  * \return
  * Popped integer value.
+ *
+ * \throws stack_exception
+ * If the stack is empty.
  */
 int TopStack::pop()
 {
+    if (stack.empty())
+    {
+        throw stack_exception(__FUNCTION__ ,"Cannot pop an item when the stack is empty.");
+    }
+
 	const int value = stack.top();
 	stack.pop();
 
@@ -90,9 +119,17 @@ int TopStack::pop()
  *
  * \return
  * Highest value on the stack.
+ *
+ * \throws stack_exception
+ * If the maxes stack is empty.
  */
 int TopStack::getHighest()
 {
+    if (maxes.empty())
+    {
+        throw stack_exception(__FUNCTION__ ,"Cannot get highest value when the stack is empty.");
+    }
+
 	return maxes.top();
 }
 
@@ -101,6 +138,26 @@ int main(int argc, char **argv)
 	bool pass = true;
 
 	TopStack topStack;
+
+    // testing for empty stack.
+    try
+    {
+        topStack.pop();
+    }
+    catch(const TopStack::stack_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    // testing for empty stack.
+    try
+    {
+        topStack.getHighest();
+    }
+    catch(const TopStack::stack_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 
 	topStack.push(12);
 	pass = pass && (topStack.getHighest() == 12);
