@@ -23,6 +23,9 @@ class TopStack
 {
 	protected:
 		std::stack<int> stack;
+        /// Additional stack for maintaining maxes. This should not be as bad as doubling space but in
+        /// worst case scenario it can be.
+        std::stack<int> maxes;
 
 	public:
 		/// Push a value onto the top of the stack
@@ -35,48 +38,62 @@ class TopStack
 		int getHighest();
 };
 
+/**
+ * \brief
+ * Pushes an element onto a stack.
+ *
+ * \details
+ * keeps track of current maximum on the stack by maintaining the maxes stack.
+ *
+ * \param[in] value
+ * Integer value to push onto the stack.
+ */
 void TopStack::push(int value)
 {
-	// for every value I decided to store the current max
-	// consequence of this however is that the memory usage is doubled maintaining linearity
+    stack.push(value);
 
-	if (!stack.empty())
-	{
-		const int prev_max = stack.top();
-
-		if (value > prev_max)
-		{
-			stack.push(value);
-			stack.push(value);
-		}
-		else
-		{
-			stack.push(value);
-			stack.push(prev_max);
-		}
-	}
-	else
-	{
-		stack.push(value);
-		stack.push(value);
-	}
-
+    // update max value stack if it is the first item or the value is greater than our existing recorded high
+    // value.
+    if (maxes.empty() || value >= maxes.top())
+    {
+            maxes.push(value);
+    }
 }
 
+/**
+ * \brief
+ * Pop an item out of the stack.
+ *
+ * \details
+ * Pops an item while keeping track of the left over max values in the stack.
+ *
+ * \return
+ * Popped integer value.
+ */
 int TopStack::pop()
 {
-	const int max = stack.top();
-	stack.pop();
-
 	const int value = stack.top();
 	stack.pop();
+
+    // if the popped value is also the currently recorded highest then remove it.
+    if (value == maxes.top())
+    {
+        maxes.pop();
+    }
 
 	return value;
 }
 
+/**
+ * \brief
+ * Returns the current recorded maximum value on the stack.
+ *
+ * \return
+ * Highest value on the stack.
+ */
 int TopStack::getHighest()
 {
-	return stack.top();
+	return maxes.top();
 }
 
 int main(int argc, char **argv)
@@ -86,19 +103,15 @@ int main(int argc, char **argv)
 	TopStack topStack;
 
 	topStack.push(12);
-	std::cout << "12" << ": " << topStack.getHighest() <<  std::endl;
 	pass = pass && (topStack.getHighest() == 12);
 
 	topStack.push(6);
-	std::cout << "12 6" << ": " << topStack.getHighest() <<  std::endl;
 	pass = pass && (topStack.getHighest() == 12);
 
 	topStack.push(42);
-	std::cout << "12 6 42" << ": " << topStack.getHighest() <<  std::endl;
 	pass = pass && (topStack.getHighest() == 42);
 
 	topStack.pop();
-	std::cout << "12 6" << ": " << topStack.getHighest() <<  std::endl;
 	pass = pass && (topStack.getHighest() == 12);
 
 	printf("%s\n", pass ? "PASS" : "FAIL");
